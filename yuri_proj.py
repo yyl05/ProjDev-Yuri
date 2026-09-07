@@ -107,7 +107,19 @@ def populate_tree(tree, parent, folder):
 window = tk.Tk()
 window.title("yuuriy")
 window.geometry("700x500")
-window.configure(bg="Red") # Fond rouge pour rendre les écarts de grille très visibles
+
+# couleurs rouge
+BG = "#160B0D"          
+PANEL = "#241317"       
+PANEL_ALT = "#2E181D"   
+RED = "#D94A5A"         
+RED_DARK = "#8F2636"    
+RED_LIGHT = "#FF7A88"   
+TEXT = "#F7E9EB"        
+TEXT_MUTED = "#CFAEB3"  
+INPUT = "#1B0F12"      
+
+window.configure(bg=BG)
 
 # configuration de 3 colonnes dans window
 window.columnconfigure(0, weight=1)
@@ -116,8 +128,22 @@ window.columnconfigure(2, weight=1)
 window.rowconfigure(0, weight=1) # une ligne (pour le treeview)
 
 # création du menu principal
-menu_bar = tk.Menu(window)
-file_menu = tk.Menu(menu_bar, tearoff=False) # menu non détachable
+menu_bar = tk.Menu(
+    window,
+    bg=PANEL,
+    fg=TEXT,
+    activebackground=RED_DARK,
+    activeforeground="white",
+    relief="flat"
+)
+file_menu = tk.Menu(
+    menu_bar,
+    tearoff=False,
+    bg=PANEL,
+    fg=TEXT,
+    activebackground=RED_DARK,
+    activeforeground="white"
+) # menu non détachable
 file_menu.add_command(label="display directory", command=display_directory)
 file_menu.add_separator()
 file_menu.add_command(label="Ecrire Hello", command=lambda : print("hello"))
@@ -132,9 +158,9 @@ window.config(menu=menu_bar)
 # création d'une frame pour le treeview (avec bordure visible)
 tree_frame = tk.Frame(
     window, 
-    bg="lightgray", 
-    highlightbackground="blue", 
-    highlightthickness=3,
+    bg=PANEL, 
+    highlightbackground=RED_DARK, 
+    highlightthickness=2,
     relief="solid",
     bd=1
 )
@@ -145,31 +171,72 @@ tree_frame.columnconfigure(0, weight=1) # première colonne de la frame
 
 file_information = tk.Frame(
     window,
-    bg="purple",
-    highlightbackground="Red",
-    highlightthickness=3,
-    bd=3
+    bg=PANEL_ALT,
+    highlightbackground=RED_DARK,
+    highlightthickness=2,
+    bd=2
 )
 file_information.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
 
 project_area = tk.Frame(
     window,
-    bg="purple",
-    highlightbackground="Red",
-    highlightthickness=3,
-    bd=3
+    bg=PANEL_ALT,
+    highlightbackground=RED_DARK,
+    highlightthickness=2,
+    bd=2
 )
 project_area.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
 
+project_title = Label(
+    project_area,
+    text="TOOLS",
+    font=("Arial", 11, "bold"),
+    bg=PANEL_ALT,
+    fg=RED_LIGHT
+)
+project_title.pack(anchor="w", padx=10, pady=(10, 8))
+
+project_text = Label(
+    project_area,
+    text="Select a file in the\ntree to display its\ninformation.",
+    font=("Arial", 9),
+    bg=PANEL_ALT,
+    fg=TEXT_MUTED,
+    justify="left"
+)
+project_text.pack(anchor="w", padx=10)
+
 # Style avec bordures explicites pour le Treeview
 style = ttk.Style()
+style.theme_use("clam")
+
 style.configure(
     "Treeview",
+    background=INPUT,
+    fieldbackground=INPUT,
+    foreground=TEXT,
     font=("Arial", 10),
-    rowheight=28,
-    foreground="Red", #couleur d'écriture
-    relief="solid",
-    bd=2
+    rowheight=30,
+    borderwidth=0
+)
+
+style.map(
+    "Treeview",
+    background=[("selected", RED_DARK)],
+    foreground=[("selected", "white")]
+)
+
+style.configure(
+    "Treeview.Heading",
+    background=RED_DARK,
+    foreground="white",
+    font=("Arial", 10, "bold"),
+    padding=8
+)
+
+style.map(
+    "Treeview.Heading",
+    background=[("active", RED)]
 )
 
 # création du treeview et placement
@@ -178,32 +245,43 @@ tree.heading("#0", text="Directory Tree")
 tree.grid(row=0, column=0, sticky="nswe", padx=3, pady=3) # placement avec marges
 
 # éléments de la section file information
-label_title = Label(file_information, text="File Information", font=("Arial", 10, "bold"))
-label_title.pack(anchor="w", padx=5, pady=2)
+label_title = Label(
+    file_information,
+    text="FILE INFORMATION",
+    font=("Arial", 11, "bold"),
+    bg=PANEL_ALT,
+    fg=RED_LIGHT
+)
+label_title.pack(anchor="w", padx=10, pady=(10, 8))
 
-Label(file_information, text="Name:").pack(anchor="w", padx=5)
-entry_name = Entry(file_information, state="readonly")
-entry_name.pack(fill="x", padx=5, pady=(0, 5))
+def create_info_field(parent, label_text):
+    Label(
+        parent,
+        text=label_text,
+        font=("Arial", 9, "bold"),
+        bg=PANEL_ALT,
+        fg=TEXT_MUTED
+    ).pack(anchor="w", padx=10, pady=(3, 2))
 
-Label(file_information, text="Path:").pack(anchor="w", padx=5)
-entry_path = Entry(file_information, state="readonly")
-entry_path.pack(fill="x", padx=5, pady=(0, 5))
+    entry = Entry(
+        parent,
+        state="readonly",
+        readonlybackground=INPUT,
+        fg=TEXT,
+        bg=INPUT,
+        insertbackground=TEXT,
+        relief="flat",
+        font=("Arial", 9)
+    )
+    entry.pack(fill="x", padx=10, pady=(0, 7))
+    return entry
 
-Label(file_information, text="Type:").pack(anchor="w", padx=5)
-entry_type = Entry(file_information, state="readonly")
-entry_type.pack(fill="x", padx=5, pady=(0, 5))
-
-Label(file_information, text="Size:").pack(anchor="w", padx=5)
-entry_size = Entry(file_information, state="readonly")
-entry_size.pack(fill="x", padx=5, pady=(0, 5))
-
-Label(file_information, text="Modified:").pack(anchor="w", padx=5)
-entry_modified = Entry(file_information, state="readonly")
-entry_modified.pack(fill="x", padx=5, pady=(0, 5))
-
-Label(file_information, text="Permissions:").pack(anchor="w", padx=5)
-entry_permissions = Entry(file_information, state="readonly")
-entry_permissions.pack(fill="x", padx=5, pady=(0, 5))
+entry_name = create_info_field(file_information, "Name")
+entry_path = create_info_field(file_information, "Path")
+entry_type = create_info_field(file_information, "Type")
+entry_size = create_info_field(file_information, "Size")
+entry_modified = create_info_field(file_information, "Modified")
+entry_permissions = create_info_field(file_information, "Permissions")
 
 # quand on sélectionne un fichier, on appelle display_file_info
 tree.bind("<<TreeviewSelect>>", display_file_info) 
