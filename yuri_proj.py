@@ -13,6 +13,7 @@ import os
 node_paths = {} #garder les chemins complets
 
 # afficher des détails sur un fichier
+# pour cette partie l'IA m'a aidé à coder
 def display_file_info(event):
     selected_nodes = tree.selection() #fichier sélectionné
     if not selected_nodes:
@@ -276,6 +277,7 @@ def create_info_field(parent, label_text):
     entry.pack(fill="x", padx=10, pady=(0, 7))
     return entry
 
+# pour cette partie l'IA m'a aidé à finir le code avec la defs
 entry_name = create_info_field(file_information, "Name")
 entry_path = create_info_field(file_information, "Path")
 entry_type = create_info_field(file_information, "Type")
